@@ -5,11 +5,13 @@ using System.Threading;
 
 public class TellyNetConnect : MonoBehaviour {
 
+	int messageId = 0;
+
 	// Use this for initialization
 	IEnumerator Start () {
 
 		// Tellynet Server
-		string tellynetServer = "127.0.0.1";
+		string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
 		string tellynetPort = ":3000";
 		string tellynetSocketProtocol = "ws://";
 
@@ -22,7 +24,7 @@ public class TellyNetConnect : MonoBehaviour {
 		// Connect to the robot and start the serial thread
 		var serialThread = new SerialThread(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages);
 		var thread = new Thread(new ThreadStart(serialThread.RunForever));
-		thread.Start();
+		thread.Start();	
 
 		// Connect to the Tellynet web socket server
 		WebSocket w = new WebSocket(new Uri(tellynetSocketProtocol + tellynetServer + tellynetPort));
@@ -32,16 +34,21 @@ public class TellyNetConnect : MonoBehaviour {
 		while (true)
 		{
 			string reply = w.RecvString();
-			if (reply != null)
-			{
+			string botReply = serialThread.ReadSerialMessage ();
+
+			if (reply != null) {
 				serialThread.SendSerialMessage (reply);
 				Debug.Log (reply);
 			}
-			if (w.error != null)
-			{
+			if (w.error != null) {
 				Debug.LogError ("Error: "+w.error);
 				break;
 			}
+
+			if (botReply != null) {
+				Debug.Log("Bot replied: " + botReply);
+			}
+
 			yield return 0;
 		}
 		w.Close();
