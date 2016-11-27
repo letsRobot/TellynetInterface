@@ -2,10 +2,6 @@
 using System.Collections;
 using System;
 using System.Threading;
-using System.Net.Sockets;
-using System.IO;
-using System.Text;
-using System.Collections.Generic;
 
 public class TellyNetConnect : MonoBehaviour {
 
@@ -28,7 +24,7 @@ public class TellyNetConnect : MonoBehaviour {
 		// Connect to the robot and start the serial thread
 		var serialThread = new SerialThread(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages);
 		var thread = new Thread(new ThreadStart(serialThread.RunForever));
-		thread.Start();
+		thread.Start();	
 
 		// Connect to the Tellynet web socket server
 		WebSocket w = new WebSocket(new Uri(tellynetSocketProtocol + tellynetServer + tellynetPort));
@@ -50,8 +46,7 @@ public class TellyNetConnect : MonoBehaviour {
 			}
 
 			if (botReply != null) {
-				Debug.Log("Bot replied: ");
-				Debug.Log (botReply);
+				Debug.Log("Bot replied: " + botReply);
 			}
 
 			yield return 0;
