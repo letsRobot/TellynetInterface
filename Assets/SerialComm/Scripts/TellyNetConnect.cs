@@ -2,14 +2,20 @@
 using System.Collections;
 using System;
 using System.Threading;
+using System.Net.Sockets;
+using System.IO;
+using System.Text;
+using System.Collections.Generic;
 
 public class TellyNetConnect : MonoBehaviour {
+
+	int messageId = 0;
 
 	// Use this for initialization
 	IEnumerator Start () {
 
 		// Tellynet Server
-		string tellynetServer = "127.0.0.1";
+		string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
 		string tellynetPort = ":3000";
 		string tellynetSocketProtocol = "ws://";
 
@@ -32,16 +38,22 @@ public class TellyNetConnect : MonoBehaviour {
 		while (true)
 		{
 			string reply = w.RecvString();
-			if (reply != null)
-			{
+			string botReply = serialThread.ReadSerialMessage ();
+
+			if (reply != null) {
 				serialThread.SendSerialMessage (reply);
 				Debug.Log (reply);
 			}
-			if (w.error != null)
-			{
+			if (w.error != null) {
 				Debug.LogError ("Error: "+w.error);
 				break;
 			}
+
+			if (botReply != null) {
+				Debug.Log("Bot replied: ");
+				Debug.Log (botReply);
+			}
+
 			yield return 0;
 		}
 		w.Close();
