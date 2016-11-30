@@ -7,19 +7,22 @@ public class TellyNetConnect : MonoBehaviour {
 
 	int messageId = 0;
 
+	// Connection to Tellynet Server
+	string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
+	string tellynetPort = ":3000";
+	string tellynetSocketProtocol = "ws://";
+	
+	// Serial connection to Robot
+	public string portName = "/dev/cu.usbmodem12341";
+	public int baudRate = 9600;
+	public int delayBeforeReconnecting = 1000;
+	public int maxUnreadMessages = 5;
+
+
 	// Use this for initialization
 	IEnumerator Start () {
 
-		// Tellynet Server
-		string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
-		string tellynetPort = ":3000";
-		string tellynetSocketProtocol = "ws://";
 
-		// Robot
-		string portName = "/dev/tty.ArcBotics-DevB";
-		int baudRate = 9600;
-		int delayBeforeReconnecting = 1000;
-		int maxUnreadMessages = 5;
 
 		// Connect to the robot and start the serial thread
 		var serialThread = new SerialThread(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages);

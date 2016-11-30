@@ -12,7 +12,7 @@ using System.Collections;
 /**
  * Sample for reading using polling by yourself, and writing too.
  */
-public class SampleUserPolling_ReadWrite : MonoBehaviour
+public class BennySerialTest : MonoBehaviour
 {
     public SerialController serialController;
 
