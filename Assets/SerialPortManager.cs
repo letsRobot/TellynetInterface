@@ -17,14 +17,23 @@ public class SerialPortManager : MonoBehaviour {
 		//Make list to fill with serial ports.
 		List<string> serial_ports = new List<string> ();
 		
-		//Serial Port addresses are different on Unix, so change them accordingly.
+		//Serial Port addresses are different in Unix, so change them accordingly.
 		if (p == 4 || p == 128 || p == 6) {
 			string[] ttys = System.IO.Directory.GetFiles ("/dev/", "tty.*");
-			Debug.Log("Listing Serial Ports: ");
+			Debug.Log("Unix Ports: ");
 			foreach (string dev in ttys) {
 				if (dev.StartsWith ("/dev/tty.*"))
 					serial_ports.Add (dev);
 				Debug.Log (System.String.Format (dev));
+			}
+		} else {
+
+			//COM port Method for PC
+			Debug.Log("COM Ports");
+			string[] COMports = SerialPort.GetPortNames();
+			foreach (string  COM in COMports) {
+				serial_ports.Add(COM);
+				Debug.Log(System.String.Format(COM));
 			}
 		}
 	}
