@@ -11,7 +11,7 @@ public class SerialPortManager : MonoBehaviour {
 
 	public static void showPortNames() {
 
-		//First, identify the OS
+		//Check which OS we are using.
 		int p = (int)System.Environment.OSVersion.Platform;
 
 		//Make list to fill with serial ports.
@@ -22,18 +22,34 @@ public class SerialPortManager : MonoBehaviour {
 			string[] ttys = System.IO.Directory.GetFiles ("/dev/", "tty.*");
 			Debug.Log("Unix Ports: ");
 			foreach (string dev in ttys) {
-				if (dev.StartsWith ("/dev/tty.*"))
+				if (dev.StartsWith ("/dev/tty")) {
 					serial_ports.Add (dev);
-				Debug.Log (System.String.Format (dev));
+					Debug.Log (System.String.Format (dev));
+					Debug.Log ("Serial Count: " + serial_ports.Count);
+				}
 			}
+
 		} else {
 
 			//COM port Method for PC
-			Debug.Log("COM Ports");
+			Debug.Log("COM Ports: ");
 			string[] COMports = SerialPort.GetPortNames();
-			foreach (string  COM in COMports) {
+			foreach (string COM in COMports) {
 				serial_ports.Add(COM);
 				Debug.Log(System.String.Format(COM));
+				Debug.Log ("Serial Count: " + serial_ports.Count);
+			}
+		}
+
+		Debug.Log ("# of Serial Ports Detected: " + serial_ports.Count);
+
+		//Looking For a specific string in port name
+		for (int i = 0; i < serial_ports.Count; i++) {
+		//foreach (string myPorts in serial_ports) {
+			Debug.Log ("Checking the Ports");
+			string thisPort = (string)serial_ports[i];
+			if (thisPort.Contains("ArcBotics")) {
+				Debug.Log("Use this Port!");
 			}
 		}
 	}
