@@ -2,58 +2,58 @@
 using System.Collections;
 using System;
 using System.Threading;
+using System.Collections.Generic;
+
+public class TellyNetWrapper : MonoBehaviour { 
+
+	public RobotMessages robotMessages;
+
+	public TellyNetWrapper(string server, int port) {
+		robotMessages = new RobotMessages (server, port);
+	}
+}
 
 public class TellyNetConnect : MonoBehaviour {
 
-	int messageId = 0;
-
-	// Connection to Tellynet Server
-	string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
-	string tellynetPort = ":3000";
-	string tellynetSocketProtocol = "ws://";
-	
-	// Serial connection to Robot
-	public string portName = "/dev/cu.usbmodem12341";
-	public int baudRate = 9600;
-	public int delayBeforeReconnecting = 1000;
-	public int maxUnreadMessages = 5;
-
-
+	TellyNetWrapper tw;
+	SerialThread serialThread;
+	Thread thread;
+			
 	// Use this for initialization
 	IEnumerator Start () {
 
+		// Connection to Tellynet Server
+		//string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
+		string tellynetServer = "127.0.0.1";
+		int tellynetPort = 3000;
 
+		// Serial connection to Robot
+		//string portName = "/dev/cu.usbmodem12341";
+		string portName = "/dev/tty.ArcBotics-DevB";
+		int baudRate = 9600;
+		int delayBeforeReconnecting = 1000;
+		int maxUnreadMessages = 5;
 
+		tw = new TellyNetWrapper ("127.0.0.1", 8000);
 		// Connect to the robot and start the serial thread
-		var serialThread = new SerialThread(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages);
-		var thread = new Thread(new ThreadStart(serialThread.RunForever));
+		serialThread = new SerialThread(portName, baudRate, delayBeforeReconnecting, maxUnreadMessages);
+		thread = new Thread(new ThreadStart(serialThread.RunForever));
 		thread.Start();	
 
-		// Connect to the Tellynet web socket server
-		WebSocket w = new WebSocket(new Uri(tellynetSocketProtocol + tellynetServer + tellynetPort));
-		yield return StartCoroutine(w.Connect());
+		yield return 0; 
+	}
 
-		// Start Message Loop
-		while (true)
-		{
-			string reply = w.RecvString();
-			string botReply = serialThread.ReadSerialMessage ();
-
-			if (reply != null) {
-				serialThread.SendSerialMessage (reply);
-				Debug.Log (reply);
-			}
-			if (w.error != null) {
-				Debug.LogError ("Error: "+w.error);
-				break;
-			}
-
-			if (botReply != null) {
-				Debug.Log("Bot replied: " + botReply);
-			}
-
-			yield return 0;
+	void Update() {
+		var messages = tw.robotMessages.GetChatMessages();
+		string botReply = serialThread.ReadSerialMessage ();
+		if (messages.Count > 0) {
+			string message = messages [0].message;
+			Debug.Log (message);
+			serialThread.SendSerialMessage (message);
 		}
-		w.Close();
+
+		if (botReply != null) {
+			Debug.Log("Bot replied: " + botReply);
+		}
 	}
 }
