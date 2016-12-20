@@ -44,25 +44,39 @@ public class TellyNetConnect : MonoBehaviour {
 		// Start Message Loop
 		while (true)
 		{
+			//Grabs messages from TellyNet
 			string reply = w.RecvString();
+			//Grabs serial messages from the robot
 			string botReply = serialThread.ReadSerialMessage ();
 
 
 			if (reply != null) {
-
+				//Parse the string if it's readable. 
 				if (reply.GetType () == typeof(string)) {
+					//The messages from TellyNet are JSON objects
 					try { SimpleJSON.JSONNode msg = SimpleJSON.JSON.Parse(reply);
+
+						//This is a special use case for the bitslapper, 
+						//We need to develop a whole new command protocol instead.
 						if (msg["bits"].Value != "") {
 							Debug.Log (msg["bits"].Value);
+							var bitAmount = int.Parse(msg["bits"].Value);
+							if (bitAmount >= 1) {
+								toRobot = "bitslap";
+							}
 						}
-						toRobot = msg["message"].Value;
-						Debug.Log(msg["username"].Value);
+
+						//example of how to grab user chat messages from TellyNet.
+						Debug.Log(msg["username"].Value + ": " + msg["message"].Value);
 					} 	catch(KeyNotFoundException) {}
-					
 				}
 
-				serialThread.SendSerialMessage (toRobot);
-				Debug.Log (toRobot);
+				//If there is a message we can send the robot, that happens here.
+				if (toRobot != null) {
+					serialThread.SendSerialMessage (toRobot);
+					Debug.Log (toRobot);
+				}
+
 			}
 			if (w.error != null) {
 				Debug.LogError ("Error: "+w.error);
