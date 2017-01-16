@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using SimpleJSON;
+using WebSocketSharp;
 
 //Twitch Keys for Reference: 
 //badges, subscriber, bits, color, display-name, emotes: null, id, mod, username
@@ -38,14 +39,14 @@ public class TellyNetConnect : MonoBehaviour {
 
 
 		// Connect to the Tellynet web socket server
-		WebSocket w = new WebSocket(new Uri(tellynetSocketProtocol + tellynetServer + tellynetPort));
-		yield return StartCoroutine(w.Connect());
-
+		var ws = new WebSocket (tellynetSocketProtocol + tellynetServer + tellynetPort);
+		ws.Connect ();
 		// Start Message Loop
 		while (true)
 		{
 			//Grabs messages from TellyNet
-			string reply = w.RecvString();
+
+			string reply = null;
 			//Grabs serial messages from the robot
 			string botReply = serialThread.ReadSerialMessage ();
 
@@ -61,9 +62,12 @@ public class TellyNetConnect : MonoBehaviour {
 						if (msg["bits"].Value != "") {
 							Debug.Log (msg["bits"].Value);
 							var bitAmount = int.Parse(msg["bits"].Value);
-							if (bitAmount >= 1) {
+							if (bitAmount >= 100) {
 								toRobot = "bitslap";
+							} else if (bitAmount <= 99 && bitAmount >= 10) {
+								toRobot = "bittyslap";
 							}
+
 						}
 
 						//example of how to grab user chat messages from TellyNet.
@@ -75,12 +79,9 @@ public class TellyNetConnect : MonoBehaviour {
 				if (toRobot != null) {
 					serialThread.SendSerialMessage (toRobot);
 					Debug.Log (toRobot);
+					toRobot = "";
 				}
 
-			}
-			if (w.error != null) {
-				Debug.LogError ("Error: "+w.error);
-				break;
 			}
 
 			if (botReply != null) {
@@ -89,6 +90,6 @@ public class TellyNetConnect : MonoBehaviour {
 
 			yield return 0;
 		}
-		w.Close();
+	   ws.Close();
 	}
 }
