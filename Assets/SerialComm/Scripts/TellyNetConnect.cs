@@ -40,10 +40,19 @@ public class TellyNetConnect : MonoBehaviour {
 		var ws = new WebSocket (tellynetSocketProtocol + tellynetServer + tellynetPort);
 		ws.Connect ();
 		//Send a room specific join message to Tellynet
-		ws.Send ("join_#letsrobot");
+		ws.Send ("join #letsrobot");
 
 		//Grabs messages from TellyNet
 		ws.OnMessage += (sender, e) => {
+
+			//Check to see if robot says first.
+			string botReply = serialThread.ReadSerialMessage ();
+
+			if (botReply != null) {
+				Debug.Log("Bot replied: " + botReply);
+			}
+
+
 			Console.WriteLine ("Laputa says: " + e.Data);
 			string reply = e.Data;
 			if (e.IsText) {
@@ -62,6 +71,9 @@ public class TellyNetConnect : MonoBehaviour {
 							toRobot = "bittyslap";
 						}
 
+					} else {
+						//Comment this out if you don't want to send all messages to robot
+						toRobot = msg["message"].Value;
 					}
 
 					//example of how to grab user chat messages from TellyNet.
@@ -76,20 +88,7 @@ public class TellyNetConnect : MonoBehaviour {
 				}
 			}
 		};
-		
-
-		// Start Message Loop
-		while (true)
-		{
-			//Grabs serial messages from the robot
-			string botReply = serialThread.ReadSerialMessage ();
-
-			if (botReply != null) {
-				Debug.Log("Bot replied: " + botReply);
-			}
-
-			yield return 0;
-		}
-	   ws.Close();
+		yield return 0;
 	}
 }
+
