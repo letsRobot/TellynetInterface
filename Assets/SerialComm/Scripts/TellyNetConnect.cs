@@ -15,7 +15,7 @@ public class TellyNetConnect : MonoBehaviour {
 	int messageId = 0;
 
 	// Connection to Tellynet Server
-	string tellynetServer = "ec2-54-191-54-225.us-west-2.compute.amazonaws.com";
+	string tellynetServer = "ec2-54-202-141-221.us-west-2.compute.amazonaws.com";
 	string tellynetPort = ":3000";
 	string tellynetSocketProtocol = "ws://";
 	
