@@ -38,7 +38,9 @@ public class TellyNetConnect : MonoBehaviour {
 
 		// Connect to the Tellynet web socket server
 		var ws = new WebSocket (tellynetSocketProtocol + tellynetServer + tellynetPort);
-		ws.Connect ();
+		try { 
+			ws.Connect ();
+		
 		//Send a room specific join message to Tellynet
 		ws.Send ("join #letsrobot");
 
@@ -88,6 +90,8 @@ public class TellyNetConnect : MonoBehaviour {
 				}
 			}
 		};
+		} catch {Debug.Log ("Can't connect to TellyNet");
+		}
 		yield return 0;
 	}
 }
