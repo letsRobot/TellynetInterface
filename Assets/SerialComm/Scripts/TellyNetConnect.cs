@@ -26,6 +26,7 @@ public class TellyNetConnect : MonoBehaviour {
 	public int maxUnreadMessages = 5;
 
 	string toRobot;
+	WebSocket socket;
 
 
 	// Use this for initialization
@@ -40,6 +41,7 @@ public class TellyNetConnect : MonoBehaviour {
 		var ws = new WebSocket (tellynetSocketProtocol + tellynetServer + tellynetPort);
 		try { 
 			ws.Connect ();
+			socket = ws;
 		
 		//Send a room specific join message to Tellynet
 		ws.Send ("join #letsrobot");
@@ -93,6 +95,11 @@ public class TellyNetConnect : MonoBehaviour {
 		} catch {Debug.Log ("Can't connect to TellyNet");
 		}
 		yield return 0;
+	}
+
+	void OnApplicationQuit() {
+		socket.Close ();
+		
 	}
 }
 
