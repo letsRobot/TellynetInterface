@@ -98,8 +98,10 @@ public class TellyNetConnect : MonoBehaviour {
 	}
 
 	void OnApplicationQuit() {
-		socket.Close ();
-		
+
+		if (socket != null) {
+			socket.Close ();
+		}
 	}
 }
 
